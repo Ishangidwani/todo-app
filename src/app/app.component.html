@@ -1,0 +1,50 @@
+<mat-form-field class="px-2">
+  <input
+    matInput
+    required
+    #eventDate
+    [min]="date"
+    [matDatepicker]="picker"
+    [(ngModel)]="date"
+    placeholder="Choose a date"
+  />
+  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+  <mat-datepicker #picker></mat-datepicker>
+  <mat-error *ngIf="eventDate.errors && eventDate.errors.required"
+    >Event date is required</mat-error
+  >
+</mat-form-field>
+
+<mat-form-field class="px-2">
+  <textarea
+    matInput
+    [(ngModel)]="eventName"
+    #eventn
+    placeholder="Event"
+    required
+  ></textarea>
+  <mat-error *ngIf="eventn.errors && eventn.errors.required"
+    >Event name is required</mat-error
+  >
+</mat-form-field>
+<button mat-raised-button color="primary" (click)="addEvent()">Add</button>
+
+<mat-accordion>
+  <mat-card
+    >Upcoming Events
+    <mat-expansion-panel *ngFor="let date of todoByDate">
+      <mat-expansion-panel-header>
+        <mat-panel-title >  
+          <div >{{ date.formattedDate }} </div>
+          <div style="font-size: 18px;padding: 6px 10px;top: -8px;position: relative;"
+          class="mat-badge-content">{{date.data.length}}</div>
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <mat-list role="list">
+        <mat-list-item role="listitem" *ngFor="let event of date.data">
+          {{ event.name }}
+        </mat-list-item>
+      </mat-list>
+    </mat-expansion-panel>
+  </mat-card>
+</mat-accordion>
