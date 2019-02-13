@@ -15,7 +15,11 @@ app.post('/api/save', function (req, res) {
         body += data;
     });
     req.on('end', function (){
-        fs.write(filePath, body, function() {
+        fs.writeFile(filePath, body, function(err) {
+			if(err){
+				console.log("Error ---------------------");
+			}
+			console.log("The file was saved!");
             res.end();
         });
     });
