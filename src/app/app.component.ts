@@ -5,10 +5,10 @@ import {
   ElementRef,
   ViewChild
 } from "@angular/core";
-import { Todo, TodoByDate } from "./todo.model";
+import { Todo, TodoByDate } from "./models/todo.model";
 import { MAT_DATE_FORMATS } from "@angular/material";
 import { FormControl } from '@angular/forms';
-import { HttpService } from './http.service';
+import { HttpService } from './services/http.service';
 export const MY_FORMATS = {
   parse: {
     dateInput: "LL"
@@ -33,10 +33,12 @@ export class AppComponent implements OnInit, AfterViewInit {
   today = this.date;
   todos: Array<Todo> = new Array<Todo>();
   todoByDate: Array<TodoByDate> = new Array<TodoByDate>();
+  pastTodoByDate: Array<TodoByDate> = new Array<TodoByDate>();
   numberOfDays: Array<number>;
   nameControl = new FormControl('');
   @ViewChild("calenderbody")
   calenderBody: ElementRef;
+  hasDataArrived: boolean = true;
   constructor(private http: HttpService){
 
   }
@@ -45,7 +47,9 @@ export class AppComponent implements OnInit, AfterViewInit {
     this.http.getTodos().subscribe((response)=>{
       this.todos = response;
       this.rearrangeDate();
+      this.hasDataArrived = false;
     },(error)=>{
+      this.hasDataArrived = false;
       console.log("Error while fetching", error);
     })
   }
@@ -95,15 +99,30 @@ export class AppComponent implements OnInit, AfterViewInit {
   }
   rearrangeDate() {
     this.todoByDate.length = 0;
-    const groups = this.todos.reduce((groups, todo) => {
+    let currentDate = new Date();
+    let currentTodo = new Array<Todo>();
+    let pastTodo = new Array<Todo>();
+    this.todos.forEach((todo)=>{
+      if(currentDate > new Date(todo.eventTime)){
+        pastTodo.push(todo);
+      }
+      else{
+        currentTodo.push(todo);
+      }
+    });
+    this.todoByDate = this.getGroupedTodo(currentTodo);
+    this.pastTodoByDate = this.getGroupedTodo(pastTodo);
+  }
+  getGroupedTodo(todo: Array<Todo>): Array<TodoByDate>{
+    const groups = todo.reduce((groups, todo) => {
       const date = todo.eventTime;
       if (!groups[date]) {
         groups[date] = [];
       }
       groups[date].push(todo);
       return groups;
-    }, {});
-    this.todoByDate = Object.keys(groups).map((date) => {
+    }, {})
+    return Object.keys(groups).map((date) => {
       let tdb = new TodoByDate();
       tdb.date = new Date(date);
       tdb.formattedDate = date;

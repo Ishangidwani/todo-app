@@ -1,6 +1,6 @@
 import { Injectable, Inject } from "@angular/core";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { TodoByDate, Todo } from "./todo.model";
+import { TodoByDate, Todo } from "./../models/todo.model";
 import { Observable } from "rxjs";
 import { catchError } from "rxjs/operators";
 
